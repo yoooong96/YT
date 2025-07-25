@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bouncing Ball Simulation</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #111;
+        }
+        canvas {
+            border: 2px solid white;
+            background-color: black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="simulationCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('simulationCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const boxSize = 500;
+        canvas.width = boxSize;
+        canvas.height = boxSize;
+
+        const rainbowColors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#9400D3'];
+
+        let ball = {
+            x: boxSize / 2,
+            y: boxSize / 2,
+            radius: 20,
+            dx: (Math.random() > 0.5 ? 1 : -1) * 3,
+            dy: (Math.random() > 0.5 ? 1 : -1) * 3,
+            colorIndex: 0,
+            radiusIncrease: 5
+        };
+
+        let animationFrameId;
+
+        function drawBall() {
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fillStyle = rainbowColors[ball.colorIndex];
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        function showEndScreen() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.font = "bold 40px Arial";
+            ctx.fillStyle = "white";
+            ctx.textAlign = "center";
+            ctx.fillText("SIMULATION END", canvas.width / 2, canvas.height / 2);
+        }
+
+        function update() {
+            // 1. 시뮬레이션 종료 조건 확인
+            if (ball.radius * 2 >= boxSize) {
+                drawBall(); // 마지막 공의 모습을 그림
+                showEndScreen();
+                cancelAnimationFrame(animationFrameId);
+                return;
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBall();
+
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+
+            let verticalHit = false;
+            let horizontalHit = false;
+
+            if (ball.x + ball.radius >= canvas.width || ball.x - ball.radius <= 0) {
+                ball.dx *= -1;
+                verticalHit = true;
+            }
+
+            if (ball.y + ball.radius >= canvas.height || ball.y - ball.radius <= 0) {
+                ball.dy *= -1;
+                horizontalHit = true;
+            }
+
+            if (verticalHit || horizontalHit) {
+                ball.radius += ball.radiusIncrease;
+                ball.colorIndex = (ball.colorIndex + 1) % rainbowColors.length;
+
+                // 2. 랜덤한 바운스 효과 추가
+                if (verticalHit) {
+                    ball.dy += (Math.random() - 0.5) * 2; // 수직 충돌 시 y축 속도에 랜덤값 추가
+                }
+                if (horizontalHit) {
+                    ball.dx += (Math.random() - 0.5) * 2; // 수평 충돌 시 x축 속도에 랜덤값 추가
+                }
+
+                // 위치 보정
+                if (ball.x - ball.radius < 0) ball.x = ball.radius;
+                if (ball.x + ball.radius > canvas.width) ball.x = canvas.width - ball.radius;
+                if (ball.y - ball.radius < 0) ball.y = ball.radius;
+                if (ball.y + ball.radius > canvas.height) ball.y = canvas.height - ball.radius;
+            }
+
+            animationFrameId = requestAnimationFrame(update);
+        }
+
+        update();
+    </script>
+</body>
+</html>
