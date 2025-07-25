@@ -17,10 +17,74 @@
             border: 2px solid white;
             background-color: black;
         }
+        .simulation-container {
+            position: relative; /* For absolute positioning of buttons */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* The canvas itself will define the size of this container */
+        }
+        .control-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: black;
+            background-color: #39ff14; /* neon green */
+            border: 2px solid #39ff14;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.7);
+            z-index: 10; /* Ensure buttons are above canvas */
+        }
+        .control-btn:hover {
+            background-color: black;
+            color: #39ff14;
+            box-shadow: 0 0 15px rgba(57, 255, 20, 1);
+        }
+        .control-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 0 7px rgba(57, 255, 20, 0.5);
+        }
+        .index-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+        }
+        .speed-controls {
+            position: fixed;
+            bottom: 20px; /* Move to bottom */
+            left: 50%; /* Center horizontally */
+            transform: translateX(-50%); /* Adjust for horizontal centering */
+            display: flex;
+            flex-direction: row; /* Arrange buttons in a row */
+            gap: 10px; /* Space between speed buttons */
+        }
+        .speed-btn {
+            /* Inherits from .control-btn */
+        }
+        .restart-btn {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px; /* Make it more prominent */
+            padding: 20px 40px;
+        }
     </style>
 </head>
 <body>
-    <canvas id="simulationCanvas"></canvas>
+    <button id="goToIndexBtn" class="control-btn index-btn">Go to Index</button>
+
+    <div class="simulation-container">
+        <canvas id="simulationCanvas"></canvas>
+    </div>
+
+    <div class="speed-controls">
+        <button id="speedUpBtn" class="control-btn speed-btn">Speed Up</button>
+        <button id="speedDownBtn" class="control-btn speed-btn">Speed Down</button>
+    </div>
 
     <script>
         const canvas = document.getElementById('simulationCanvas');
@@ -32,6 +96,12 @@
         const rainbowColors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#9400D3'];
 
         let animationFrameId;
+
+        // Speed control variables
+        const SPEED_FACTOR = 0.01; // Adjust this for how much speed changes per click
+        const MIN_SPEED_MULTIPLIER = 0.5; // Minimum speed relative to initial baseSpeed
+        const MAX_SPEED_MULTIPLIER = 3.0; // Maximum speed relative to initial baseSpeed
+        let currentSpeedMultiplier = 1.0; // Start at normal speed
 
         function initializeSimulation() {
             // Calculate boxSize based on current window dimensions
@@ -47,11 +117,17 @@
                 x: boxSize / 2,
                 y: boxSize / 2,
                 radius: boxSize * 0.04, // 캔버스 크기에 비례하여 초기 반지름 설정
-                dx: (Math.random() > 0.5 ? 1 : -1) * (boxSize * 0.006), // 캔버스 크기에 비례하여 속도 설정
-                dy: (Math.random() > 0.5 ? 1 : -1) * (boxSize * 0.006),
                 colorIndex: 0,
                 radiusIncrease: boxSize * 0.01 // 캔버스 크기에 비례하여 반지름 증가량 설정
             };
+
+            // Set a constant speed and random direction based on currentSpeedMultiplier
+            const baseSpeed = boxSize * SPEED_FACTOR * currentSpeedMultiplier; // Use currentSpeedMultiplier here
+            const angle = Math.random() * Math.PI * 2; // Random angle between 0 and 2*PI
+
+            ball.dx = baseSpeed * Math.cos(angle);
+            ball.dy = baseSpeed * Math.sin(angle);
+            
 
             // Restart animation if it was running
             if (animationFrameId) {
@@ -72,10 +148,16 @@
             ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            ctx.font = "bold 40px Arial";
-            ctx.fillStyle = "white";
-            ctx.textAlign = "center";
-            ctx.fillText("SIMULATION END", canvas.width / 2, canvas.height / 2);
+            // Create RESTART button
+            const restartBtn = document.createElement('button');
+            restartBtn.id = 'restartBtn';
+            restartBtn.className = 'control-btn restart-btn'; // Use existing control-btn style
+            restartBtn.textContent = 'RESTART';
+
+            // Append button to the body or a suitable container
+            document.body.appendChild(restartBtn);
+
+            restartBtn.addEventListener('click', restartSimulation);
         }
 
         function update() {
@@ -130,6 +212,47 @@
 
         window.addEventListener('load', initializeSimulation);
         window.addEventListener('resize', initializeSimulation);
+
+        // Button functionalities
+        const goToIndexBtn = document.getElementById('goToIndexBtn');
+        goToIndexBtn.addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+
+        const speedUpBtn = document.getElementById('speedUpBtn');
+        const speedDownBtn = document.getElementById('speedDownBtn');
+
+        function updateBallSpeed() {
+            if (!ball) return; // Ensure ball object exists
+
+            const currentSpeed = Math.sqrt(ball.dx * ball.dx + ball.dy * ball.dy);
+            if (currentSpeed === 0) return; // Avoid division by zero
+
+            const newSpeed = boxSize * SPEED_FACTOR * currentSpeedMultiplier;
+
+            // Maintain direction, just change magnitude
+            ball.dx = (ball.dx / currentSpeed) * newSpeed;
+            ball.dy = (ball.dy / currentSpeed) * newSpeed;
+        }
+
+        speedUpBtn.addEventListener('click', () => {
+            currentSpeedMultiplier = Math.min(currentSpeedMultiplier + 0.2, MAX_SPEED_MULTIPLIER);
+            updateBallSpeed();
+        });
+
+        speedDownBtn.addEventListener('click', () => {
+            currentSpeedMultiplier = Math.max(currentSpeedMultiplier - 0.2, MIN_SPEED_MULTIPLIER);
+            updateBallSpeed();
+        });
+
+        function restartSimulation() {
+            // Remove the restart button if it exists
+            const existingRestartBtn = document.getElementById('restartBtn');
+            if (existingRestartBtn) {
+                existingRestartBtn.remove();
+            }
+            // Re-initialize the simulation
+            initializeSimulation();
+        }
     </script>
 </body>
-</html>
