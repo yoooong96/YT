@@ -75,7 +75,7 @@
     </style>
 </head>
 <body>
-    <button id="goToIndexBtn" class="control-btn index-btn">Go to Index</button>
+    <button id="goToIndexBtn" class="control-btn index-btn">HOME</button>
 
     <div class="simulation-container">
         <canvas id="simulationCanvas"></canvas>
@@ -86,25 +86,44 @@
         <button id="speedDownBtn" class="control-btn speed-btn">Speed Down</button>
     </div>
 
+    <div class="ball-controls">
+        <button id="addBallBtn" class="control-btn speed-btn">Add Ball</button>
+    </div>
+
     <script>
         const canvas = document.getElementById('simulationCanvas');
         const ctx = canvas.getContext('2d');
 
-        let boxSize; // boxSize를 전역으로 선언하지만 초기화는 initializeSimulation에서
-        let ball;    // ball을 전역으로 선언하지만 초기화는 initializeSimulation에서
+        let boxSize;
+        let balls = []; // Change from single ball to an array of balls
 
         const rainbowColors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#9400D3'];
 
         let animationFrameId;
 
         // Speed control variables
-        const SPEED_FACTOR = 0.01; // Adjust this for how much speed changes per click
-        const MIN_SPEED_MULTIPLIER = 0.5; // Minimum speed relative to initial baseSpeed
-        const MAX_SPEED_MULTIPLIER = 3.0; // Maximum speed relative to initial baseSpeed
-        let currentSpeedMultiplier = 1.0; // Start at normal speed
+        const SPEED_FACTOR = 0.01;
+        const MIN_SPEED_MULTIPLIER = 0.5;
+        const MAX_SPEED_MULTIPLIER = 3.0;
+        let currentSpeedMultiplier = 1.0;
+
+        function createBall() {
+            const baseSpeed = boxSize * SPEED_FACTOR * currentSpeedMultiplier;
+            const angle = Math.random() * Math.PI * 2;
+
+            return {
+                x: boxSize / 2,
+                y: boxSize / 2,
+                radius: boxSize * 0.04,
+                colorIndex: 0,
+                radiusIncrease: boxSize * 0.01,
+                dx: baseSpeed * Math.cos(angle),
+                dy: baseSpeed * Math.sin(angle),
+                isAlive: true // New property to track if ball is still active
+            };
+        }
 
         function initializeSimulation() {
-            // Calculate boxSize based on current window dimensions
             boxSize = Math.min(window.innerWidth * 0.9, window.innerHeight * 0.9);
             if (window.innerWidth <= 600) {
                 boxSize = Math.min(window.innerWidth * 0.95, window.innerHeight * 0.95);
@@ -112,31 +131,16 @@
             canvas.width = boxSize;
             canvas.height = boxSize;
 
-            // Initialize ball properties based on the calculated boxSize
-            ball = {
-                x: boxSize / 2,
-                y: boxSize / 2,
-                radius: boxSize * 0.04, // 캔버스 크기에 비례하여 초기 반지름 설정
-                colorIndex: 0,
-                radiusIncrease: boxSize * 0.01 // 캔버스 크기에 비례하여 반지름 증가량 설정
-            };
+            balls = []; // Clear existing balls
+            balls.push(createBall()); // Add one initial ball
 
-            // Set a constant speed and random direction based on currentSpeedMultiplier
-            const baseSpeed = boxSize * SPEED_FACTOR * currentSpeedMultiplier; // Use currentSpeedMultiplier here
-            const angle = Math.random() * Math.PI * 2; // Random angle between 0 and 2*PI
-
-            ball.dx = baseSpeed * Math.cos(angle);
-            ball.dy = baseSpeed * Math.sin(angle);
-            
-
-            // Restart animation if it was running
             if (animationFrameId) {
                 cancelAnimationFrame(animationFrameId);
             }
-            update(); // Start/restart the animation loop
+            update();
         }
 
-        function drawBall() {
+        function drawBall(ball) {
             ctx.beginPath();
             ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
             ctx.fillStyle = rainbowColors[ball.colorIndex];
@@ -148,63 +152,71 @@
             ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Create RESTART button
             const restartBtn = document.createElement('button');
             restartBtn.id = 'restartBtn';
-            restartBtn.className = 'control-btn restart-btn'; // Use existing control-btn style
+            restartBtn.className = 'control-btn restart-btn';
             restartBtn.textContent = 'RESTART';
 
-            // Append button to the body or a suitable container
             document.body.appendChild(restartBtn);
 
             restartBtn.addEventListener('click', restartSimulation);
         }
 
         function update() {
-            // 1. 시뮬레이션 종료 조건 확인
-            if (ball.radius * 2 >= boxSize) {
-                drawBall(); // 마지막 공의 모습을 그림
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let allBallsEnded = true; // Track if all balls have ended
+
+            balls.forEach(ball => {
+                if (!ball.isAlive) return; // Skip if ball is no longer active
+
+                drawBall(ball);
+
+                ball.x += ball.dx;
+                ball.y += ball.dy;
+
+                let verticalHit = false;
+                let horizontalHit = false;
+
+                if (ball.x + ball.radius >= canvas.width || ball.x - ball.radius <= 0) {
+                    ball.dx *= -1;
+                    verticalHit = true;
+                }
+
+                if (ball.y + ball.radius >= canvas.height || ball.y - ball.radius <= 0) {
+                    ball.dy *= -1;
+                    horizontalHit = true;
+                }
+
+                if (verticalHit || horizontalHit) {
+                    ball.radius += ball.radiusIncrease;
+                    ball.colorIndex = (ball.colorIndex + 1) % rainbowColors.length;
+
+                    if (verticalHit) {
+                        ball.dy += (Math.random() - 0.5) * 2;
+                    }
+                    if (horizontalHit) {
+                        ball.dx += (Math.random() - 0.5) * 2;
+                    }
+
+                    if (ball.x - ball.radius < 0) ball.x = ball.radius;
+                    if (ball.x + ball.radius > canvas.width) ball.x = canvas.width - ball.radius;
+                    if (ball.y - ball.radius < 0) ball.y = ball.radius;
+                    if (ball.y + ball.radius > canvas.height) ball.y = canvas.height - ball.radius;
+                }
+
+                // Check if ball has reached max size
+                if (ball.radius * 2 >= boxSize) {
+                    ball.isAlive = false; // Mark ball as no longer active
+                } else {
+                    allBallsEnded = false; // At least one ball is still active
+                }
+            });
+
+            // If all balls have ended, show the end screen and stop animation
+            if (allBallsEnded && balls.length > 0) { // Ensure there was at least one ball
                 showEndScreen();
                 cancelAnimationFrame(animationFrameId);
                 return;
-            }
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawBall();
-
-            ball.x += ball.dx;
-            ball.y += ball.dy;
-
-            let verticalHit = false;
-            let horizontalHit = false;
-
-            if (ball.x + ball.radius >= canvas.width || ball.x - ball.radius <= 0) {
-                ball.dx *= -1;
-                verticalHit = true;
-            }
-
-            if (ball.y + ball.radius >= canvas.height || ball.y - ball.radius <= 0) {
-                ball.dy *= -1;
-                horizontalHit = true;
-            }
-
-            if (verticalHit || horizontalHit) {
-                ball.radius += ball.radiusIncrease;
-                ball.colorIndex = (ball.colorIndex + 1) % rainbowColors.length;
-
-                // 2. 랜덤한 바운스 효과 추가
-                if (verticalHit) {
-                    ball.dy += (Math.random() - 0.5) * 2; // 수직 충돌 시 y축 속도에 랜덤값 추가
-                }
-                if (horizontalHit) {
-                    ball.dx += (Math.random() - 0.5) * 2; // 수평 충돌 시 x축 속도에 랜덤값 추가
-                }
-
-                // 위치 보정
-                if (ball.x - ball.radius < 0) ball.x = ball.radius;
-                if (ball.x + ball.radius > canvas.width) ball.x = canvas.width - ball.radius;
-                if (ball.y - ball.radius < 0) ball.y = ball.radius;
-                if (ball.y + ball.radius > canvas.height) ball.y = canvas.height - ball.radius;
             }
 
             animationFrameId = requestAnimationFrame(update);
@@ -213,7 +225,6 @@
         window.addEventListener('load', initializeSimulation);
         window.addEventListener('resize', initializeSimulation);
 
-        // Button functionalities
         const goToIndexBtn = document.getElementById('goToIndexBtn');
         goToIndexBtn.addEventListener('click', () => {
             window.location.href = 'index.html';
@@ -221,18 +232,20 @@
 
         const speedUpBtn = document.getElementById('speedUpBtn');
         const speedDownBtn = document.getElementById('speedDownBtn');
+        const addBallBtn = document.getElementById('addBallBtn'); // Get the new button
 
         function updateBallSpeed() {
-            if (!ball) return; // Ensure ball object exists
+            balls.forEach(ball => {
+                if (!ball.isAlive) return;
 
-            const currentSpeed = Math.sqrt(ball.dx * ball.dx + ball.dy * ball.dy);
-            if (currentSpeed === 0) return; // Avoid division by zero
+                const currentSpeed = Math.sqrt(ball.dx * ball.dx + ball.dy * ball.dy);
+                if (currentSpeed === 0) return;
 
-            const newSpeed = boxSize * SPEED_FACTOR * currentSpeedMultiplier;
+                const newSpeed = boxSize * SPEED_FACTOR * currentSpeedMultiplier;
 
-            // Maintain direction, just change magnitude
-            ball.dx = (ball.dx / currentSpeed) * newSpeed;
-            ball.dy = (ball.dy / currentSpeed) * newSpeed;
+                ball.dx = (ball.dx / currentSpeed) * newSpeed;
+                ball.dy = (ball.dy / currentSpeed) * newSpeed;
+            });
         }
 
         speedUpBtn.addEventListener('click', () => {
@@ -245,13 +258,19 @@
             updateBallSpeed();
         });
 
+        addBallBtn.addEventListener('click', () => {
+            balls.push(createBall()); // Add a new ball to the array
+            // If animation was stopped (e.g., after all balls ended), restart it
+            if (!animationFrameId) {
+                update();
+            }
+        });
+
         function restartSimulation() {
-            // Remove the restart button if it exists
             const existingRestartBtn = document.getElementById('restartBtn');
             if (existingRestartBtn) {
                 existingRestartBtn.remove();
             }
-            // Re-initialize the simulation
             initializeSimulation();
         }
     </script>
