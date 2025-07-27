@@ -12,6 +12,7 @@
             height: 100vh;
             margin: 0;
             background-color: #111;
+            touch-action: manipulation;
         }
         canvas {
             border: 2px solid white;
@@ -88,6 +89,10 @@
     </div>
 
     <script>
+        document.addEventListener('dblclick', function(e) {
+            e.preventDefault();
+        }, { passive: false });
+
         const canvas = document.getElementById('simulationCanvas');
         const ctx = canvas.getContext('2d');
 
