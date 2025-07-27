@@ -9,14 +9,13 @@
         body {
             display: flex; /* 자식 요소들을 플렉스박스로 정렬합니다. */
             flex-direction: column; /* 자식 요소들을 세로로 정렬합니다. */
-            justify-content: center; /* 가로축 중앙 정렬합니다. */
-            align-items: center; /* 세로축 중앙 정렬합니다. */
-            height: 100vh; /* 화면 전체 높이를 차지하도록 설정합니다. */
+            align-items: center; /* 가로축 중앙 정렬합니다. */
+            min-height: 100vh; /* 화면 최소 높이를 100vh로 설정하여 내용이 적어도 화면 전체를 차지하도록 합니다. */
             margin: 0; /* 기본 마진을 제거합니다. */
             background-color: #111; /* 배경색을 어두운 회색으로 설정합니다. */
             touch-action: manipulation; /* 모바일에서 더블 탭으로 확대되는 것을 방지합니다. */
         }
-        /* canvas: 시뮬레이션이 그려질 캔버스 영역의 스타일을 정의합니다. */
+        /* .simulation-container: 캔버스를 감싸는 컨테이너의 스타일을 정의합니다. */
         canvas {
             border: 2px solid #39ff14; /* 네온 그린 테두리를 추가합니다. */
             background-color: black; /* 배경색을 검은색으로 설정합니다. */
@@ -26,14 +25,8 @@
         /* .top-controls: 상단 제어 버튼들을 감싸는 컨테이너의 스타일을 정의합니다. */
         .top-controls {
             position: fixed; /* 화면에 위치를 고정합니다. */
-            top: 0;
-            left: 0;
-            width: 100%;
-            padding: 10px;
-            box-sizing: border-box;
-            display: flex;
-            justify-content: space-between; /* 버튼들을 양쪽 끝으로 정렬합니다. */
-            align-items: center;
+            top: 20px;
+            left: 20px;
             z-index: 10;
         }
         /* .shape-controls: 도형 추가 버튼들을 감싸는 컨테이너의 스타일을 정의합니다. */
@@ -41,14 +34,19 @@
             display: flex;
             gap: 10px; /* 버튼들 사이의 간격을 10px로 설정합니다. */
         }
-        /* .speed-controls: 속도 조절 버튼들을 감싸는 컨테이너의 스타일을 정의합니다. */
-        .speed-controls {
-            position: fixed; /* 화면에 위치를 고정합니다. */
-            bottom: 20px; /* 아래쪽에서 20px 떨어진 곳에 위치시킵니다. */
-            left: 50%; /* 가로축 중앙에 위치시킵니다. */
-            transform: translateX(-50%); /* 정확한 중앙 정렬을 위해 위치를 조정합니다. */
-            display: flex; /* 자식 요소들을 플렉스박스로 정렬합니다. */
-            gap: 10px; /* 버튼들 사이의 간격을 10px로 설정합니다. */
+        /* .bottom-controls: 하단 제어 버튼들을 감싸는 컨테이너의 스타일을 정의합니다. */
+        .bottom-controls {
+            display: flex;
+            flex-direction: column; /* 버튼들을 세로로 정렬합니다. */
+            gap: 10px;
+            align-items: center; /* 가로축 중앙 정렬 */
+            margin-top: 20px; /* 캔버스 아래에 여백을 추가합니다. */
+        }
+
+        /* .shape-controls, .speed-controls: 버튼 그룹을 가로로 정렬합니다. */
+        .shape-controls, .speed-controls {
+            display: flex;
+            gap: 10px;
         }
         /* .control-btn: 모든 제어 버튼의 기본 스타일을 정의합니다. */
         .control-btn {
@@ -90,11 +88,6 @@
     <!-- 상단 제어 버튼 영역 -->
     <div class="top-controls">
         <button id="goToIndexBtn" class="control-btn">HOME</button>
-        <div class="shape-controls">
-            <button id="addCircleBtn" class="control-btn">Add Circle</button>
-            <button id="addSquareBtn" class="control-btn">Add Square</button>
-            <button id="addTriangleBtn" class="control-btn">Add Triangle</button>
-        </div>
     </div>
 
     <!-- 시뮬레이션 캔버스 영역 -->
@@ -102,10 +95,17 @@
         <canvas id="simulationCanvas"></canvas>
     </div>
 
-    <!-- 하단 속도 조절 버튼 영역 -->
-    <div class="speed-controls">
-        <button id="speedUpBtn" class="control-btn">Speed Up</button>
-        <button id="speedDownBtn" class="control-btn">Speed Down</button>
+    <!-- 하단 제어 버튼 영역 -->
+    <div class="bottom-controls">
+        <div class="speed-controls">
+            <button id="speedUpBtn" class="control-btn">Speed Up</button>
+            <button id="speedDownBtn" class="control-btn">Speed Down</button>
+        </div>
+        <div class="shape-controls">
+            <button id="addCircleBtn" class="control-btn">Add Circle</button>
+            <button id="addSquareBtn" class="control-btn">Add Square</button>
+            <button id="addTriangleBtn" class="control-btn">Add Triangle</button>
+        </div>
     </div>
 
     <script>
