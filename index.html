@@ -1,75 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome</title>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: black;
-            font-family: "Courier New", Courier, monospace;
-            text-align: center; /* Center align text */
-        }
-        .greeting {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            color: #39ff14; /* neon green */
-            font-size: 24px;
-            text-shadow: 0 0 5px #39ff14;
-        }
-        h1 {
-            color: #39ff14; /* neon green */
-            font-size: 48px;
-            margin-bottom: 30px;
-            text-shadow: 0 0 10px #39ff14, 0 0 20px #39ff14, 0 0 30px #39ff14;
-        }
-        .btn {
-            padding: 15px 30px;
-            font-size: 18px;
-            font-weight: bold;
-            color: black;
-            background-color: #39ff14;
-            border: 2px solid #39ff14;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            outline: none;
-            box-shadow: 0 0 15px rgba(57, 255, 20, 0.7);
-        }
-        .btn:hover {
-            background-color: black;
-            color: #39ff14;
-            box-shadow: 0 0 25px rgba(57, 255, 20, 1);
-        }
-        .btn:active {
-            transform: scale(0.95);
-            box-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
-        }
-
-        /* Responsive adjustments for smaller screens */
-        @media (max-width: 600px) {
-            .greeting {
-                font-size: 18px;
-            }
-            h1 {
-                font-size: 36px;
-            }
-            .btn {
-                padding: 12px 24px;
-                font-size: 16px;
-            }
-        }
-    </style>
+    <title>Gemini 오목 - 메인 화면</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <h1>Welcome!</h1>
-    <button class="btn" onclick="location.href='circle.html'">Simulation</button>
+<body class="main-menu">
+    <div class="main-container">
+        <div class="title-area">
+            <img src="black.png" alt="흑돌" class="stone-deco">
+            <h1>오목</h1>
+            <img src="white.png" alt="백돌" class="stone-deco">
+        </div>
+        <div class="button-container">
+            <a href="omok.html?mode=ai" class="start-button">VS AI</a>
+            <a href="omok.html?mode=user" class="start-button">VS USER</a>
+        </div>
+    </div>
 </body>
 </html>
