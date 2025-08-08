@@ -1,0 +1,214 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* 수직 중앙 정렬 추가 */
+    background-color: #f0f0f0;
+    padding: 0 20px; /* 좌우 여백 추가 */
+    box-sizing: border-box; /* 패딩을 너비에 포함 */
+}
+
+/* --- Main Menu Styles --- */
+body.main-menu {
+    background-image: url('omok.jpg');
+    background-size: cover;
+    background-position: center;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.main-menu .main-container {
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 40px 60px;
+    border-radius: 20px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+}
+
+.main-menu .title-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 40px;
+}
+
+.main-menu h1 {
+    color: white;
+    font-size: 4em;
+    text-shadow: 3px 3px 10px rgba(0,0,0,0.7);
+    margin: 0 20px;
+}
+
+.main-menu .stone-deco {
+    width: 80px;
+    height: 80px;
+}
+
+.main-menu .button-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px; /* 버튼 사이의 간격 */
+}
+
+.main-menu .start-button {
+    display: inline-block;
+    padding: 15px 40px;
+    font-size: 1.8em;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    transition: all 0.3s ease;
+
+    /* Darker Glassmorphism Style */
+    background: rgba(0, 0, 0, 0.35); /* 더 어두운 배경 */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 20px; /* 둥근 사각형 */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.main-menu .start-button:hover {
+    background: rgba(0, 0, 0, 0.5); /* 호버 시 더 어둡게 */
+    transform: scale(1.05);
+    box-shadow: 0 8px 40px 0 rgba(0, 0, 0, 0.45);
+}
+
+/* --- Game Page Styles --- */
+body.game-page {
+    position: relative;
+    background-color: #333; /* Fallback color */
+}
+
+body.game-page::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('omok.jpg');
+    background-size: cover;
+    background-position: center;
+    filter: blur(8px);
+    -webkit-filter: blur(8px);
+    z-index: -2;
+}
+
+body.game-page::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: -1;
+}
+
+.game-page h1 {
+    color: #FFD700; /* Gold color */
+    font-size: 3em; /* Increased size */
+    text-shadow: 3px 3px 10px rgba(0,0,0,0.8);
+}
+
+.game-page #game-info p {
+    color: #FFFFFF; /* White color for contrast */
+    font-size: 1.8em; /* Increased size */
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+}
+
+h1 {
+    margin-top: 10px; /* 여백 줄임 */
+    margin-bottom: 10px; /* 여백 추가 */
+    flex-shrink: 0;
+    font-size: 2.5em;
+}
+
+#game-info {
+    margin-bottom: 10px; /* 여백 줄임 */
+    text-align: center;
+    flex-shrink: 0;
+    font-size: 1.5em;
+}
+
+#game-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    width: 100%; /* 화면 전체 너비 사용 */
+    max-width: 1600px; /* 최대 너비 설정 (더 늘림) */
+}
+
+#canvas-container {
+    flex-grow: 1; /* 남은 공간을 모두 차지하도록 설정 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    max-width: calc(100% - 280px); /* 양쪽 버튼 너비와 여백을 뺀 나머지 공간 차지 */
+}
+
+#omok-board {
+    max-width: 100%;
+    max-height: 100%;
+    border: 2px solid #333;
+    aspect-ratio: 1 / 1; /* 캔버스를 항상 정사각형으로 유지 */
+}
+
+#main-menu-button, #restart-button {
+    width: 110px;
+    height: 110px;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.85);
+    text-align: center;
+    text-decoration: none; /* for <a> tag */
+    
+    /* Glassmorphism Style */
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    flex-shrink: 0;
+
+    /* Flexbox for centering text */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#main-menu-button { margin-right: 30px; }
+#restart-button { margin-left: 30px; }
+
+#main-menu-button:hover, #restart-button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(1.05);
+}
+
+#main-menu-button:active, #restart-button:active {
+    transform: scale(0.98);
+}
+
+#message {
+    font-weight: bold;
+    color: red;
+    height: 1.5em;
+}
+
+#current-turn {
+    font-weight: bold;
+}
