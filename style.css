@@ -115,7 +115,7 @@ body.game-page::after {
 
 .game-page h1 {
     color: #FFD700; /* Gold color */
-    font-size: 3em; /* Increased size */
+    font-size: 1em; /* Increased size */
     text-shadow: 3px 3px 10px rgba(0,0,0,0.8);
 }
 
